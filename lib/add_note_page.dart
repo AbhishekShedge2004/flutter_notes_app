@@ -2,6 +2,7 @@ import 'package:database_new/db_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'cubit/db_cubit.dart';
 import 'db_helper.dart';
 
 class AddNotePage extends StatelessWidget{
@@ -100,7 +101,7 @@ class AddNotePage extends StatelessWidget{
                               //   id: id,
                               // );
                             }else {
-                              context.read<DBProvider>().addNote(
+                              context.read<DBCubit>().addData(
                                   mTitle: titleController.text,
                                   mDesc: descController.text,
                                   mCreatedAt: DateTime.now().millisecondsSinceEpoch.toString()

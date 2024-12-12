@@ -1,16 +1,16 @@
+import 'package:database_new/cubit/db_cubit.dart';
 import 'package:database_new/db_helper.dart';
 import 'package:database_new/db_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import 'home_page.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider<DBProvider>(
-    create: (context) {
-    return DBProvider(dbHelper: DBHelper.getInstance());
-  },
-    child: MyApp(),));
+  runApp(BlocProvider(create: (context) {
+    return DBCubit(dbHelper: DBHelper.getInstance());
+  },child: MyApp(),));
 }
 
 class MyApp extends StatelessWidget {

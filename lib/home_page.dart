@@ -2,10 +2,12 @@ import 'package:database_new/add_note_page.dart';
 import 'package:database_new/db_helper.dart';
 import 'package:database_new/db_provider.dart';
 import 'package:database_new/main.dart';
-//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'cubit/db_cubit.dart';
+import 'cubit/db_state.dart';
 
 class HomePage extends StatelessWidget {
 
@@ -26,112 +28,140 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    context.read<DBProvider>().getInitialNotes();
+    // context.read<DBProvider>().getInitialNotes();
+    context.read<DBCubit>().getInitialNotes();
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
+
       ),
-      body: Consumer<DBProvider>(builder: (context, value, child) {
-        allNotes = value.getAllNotesFromProvider();
-        return allNotes.isNotEmpty
-        //Notes List Builder
-            ? ListView.builder(
-            itemCount: allNotes.length,
-            itemBuilder: (_, index) {
+      body: BlocBuilder<DBCubit,DBState>(
+        builder: (context,state) {
 
-              //Note View
-              return ListTile(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(child: Text(allNotes[index][DBHelper.COLUMN_NOTE_TITLE])),
-                    Text(mFormat.format(DateTime.fromMillisecondsSinceEpoch(int.parse(allNotes[index][DBHelper.COLUMN_NOTE_CREATED_AT]))),style: TextStyle(fontSize: 10),)
-                  ],
-                ),
-                subtitle: Text(allNotes[index][DBHelper.COLUMN_NOTE_DESC]),
-                trailing: SizedBox(
-                  width: 100,
-                  child: Row(
-                    children: [
+          if(state is DBLoadingState){
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if(state is DBErrorState){
+            return Center(
+              child: Text("Error: ${state.errorMsg}"),
+            );
+          }
+          if(state is DBLoadedState){
+            allNotes = state.mData; //value.getAllNotesFromProvider()
 
-                      //update
-                      IconButton(
-                          onPressed: () {
-                            var title = allNotes[index][DBHelper.COLUMN_NOTE_TITLE];
-                            var desc = allNotes[index][DBHelper.COLUMN_NOTE_DESC];
+            return allNotes.isNotEmpty
+            //Notes List Builder
+                ? ListView.builder(
+                itemCount: allNotes.length,
+                itemBuilder: (_, index) {
 
-                            // showModalBottomSheet(context: context, builder: (context) {
-                            //   return getBottomSheetUI(isUpdate: true, id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
-                            // },);
+                  //Note View
+                  return ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(child: Text(allNotes[index][DBHelper.COLUMN_NOTE_TITLE])),
+                        Text(mFormat.format(DateTime.fromMillisecondsSinceEpoch(int.parse(allNotes[index][DBHelper.COLUMN_NOTE_CREATED_AT]))),style: TextStyle(fontSize: 10),)
+                      ],
+                    ),
+                    subtitle: Text(allNotes[index][DBHelper.COLUMN_NOTE_DESC]),
+                    trailing: SizedBox(
+                      width: 100,
+                      child: Row(
+                        children: [
+                          //update
+                          IconButton(
+                              onPressed: () {
+                                var title = allNotes[index][DBHelper.COLUMN_NOTE_TITLE];
+                                var desc = allNotes[index][DBHelper.COLUMN_NOTE_DESC];
 
-                            Navigator.push(context, MaterialPageRoute(builder: (context) {
-                              return AddNotePage(isUpdate: true, id: allNotes[index][DBHelper.COLUMN_NOTE_ID], title: title, desc: desc,);
-                            },));
+                                // showModalBottomSheet(context: context, builder: (context) {
+                                //   return getBottomSheetUI(isUpdate: true, id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
+                                // },);
 
-                          },
-                          icon: Icon(Icons.edit)),
+                                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                  return AddNotePage(isUpdate: true, id: allNotes[index][DBHelper.COLUMN_NOTE_ID], title: title, desc: desc,);
+                                },));
 
-                      //delete
-                      IconButton(
-                          onPressed: () async{
-                            Provider.of<DBProvider>(context,listen: false).deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
-                            // bool check = await dbHelper.deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
-                            // if(check){
-                            //   getMyNotes();
-                            // }
-                          },
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          )),
-                    ],
-                  ),
-                ),
-              );
-            })
-            : Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('No Notes yet'),
-              OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return AddNotePage();
-                    },));
-                    // showModalBottomSheet(
-                    //     isDismissible: false,
-                    //     enableDrag: false,
-                    //     context: context,
-                    //     builder: (_) {
-                    //       return getBottomSheetUI();
-                    //     });
-                  },
-                  child: Text('Add First Note'))
-            ],
-          ),
-        );     
-      },),
-      floatingActionButton: context.watch<DBProvider>().getAllNotesFromProvider().isNotEmpty  //context.watch<DBProvider>().getAllNotes().isNotEmpty
-          ? FloatingActionButton(
-        onPressed: () async {
-          // titleController.clear();
-          // descController.clear();
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return AddNotePage();
-          },));
-          // showModalBottomSheet(
-          //     isDismissible: false,
-          //     enableDrag: false,
-          //     context: context,
-          //     builder: (_) {
-          //       return getBottomSheetUI();
-          //     });
+                              },
+                              icon: Icon(Icons.edit)),
+
+                          //delete
+                          IconButton(
+                              onPressed: () async{
+                                Provider.of<DBProvider>(context,listen: false).deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
+                                // bool check = await dbHelper.deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
+                                // if(check){
+                                //   getMyNotes();
+                                // }
+                              },
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              )),
+                        ],
+                      ),
+                    ),
+                  );
+                })
+                : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('No Notes yet'),
+                  OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          return AddNotePage();
+                        },));
+                        // showModalBottomSheet(
+                        //     isDismissible: false,
+                        //     enableDrag: false,
+                        //     context: context,
+                        //     builder: (_) {
+                        //       return getBottomSheetUI();
+                        //     });
+                      },
+                      child: Text('Add First Note'))
+                ],
+              ),
+            );
+          }
+
+          return Container();
+
         },
-        child: Icon(Icons.add),
-      )
-          : null,
+      ),
+      floatingActionButton: BlocBuilder<DBCubit,DBState>(builder: (context, state) {
+        if(state is DBLoadedState){
+          if(state.mData.isNotEmpty) {
+            return FloatingActionButton(
+              onPressed: () async {
+                // titleController.clear();
+                // descController.clear();
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return AddNotePage();
+                },));
+                // showModalBottomSheet(
+                //     isDismissible: false,
+                //     enableDrag: false,
+                //     context: context,
+                //     builder: (_) {
+                //       return getBottomSheetUI();
+                //     });
+              },
+              child: Icon(Icons.add),
+            );
+          }else{
+            return Container();
+          }
+        }
+        return Container();
+
+      },)
     );
   }
 
