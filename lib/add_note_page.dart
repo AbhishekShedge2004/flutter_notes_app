@@ -87,12 +87,12 @@ class AddNotePage extends StatelessWidget{
                             bool check = false;
 
                             if(isUpdate){
-
-                              context.read<DBProvider>().updateNote(
-                                  mUpdateTitle: titleController.text,
-                                  mUpdateDesc: descController.text,
-                                  mUpdateAt: DateTime.now().millisecondsSinceEpoch.toString(),
-                                  id: id);
+                              context.read<DBCubit>().updateData(
+                                  mUpdatedTitle: titleController.text,
+                                  mUpdatedDesc: descController.text,
+                                  mUpdatedAt: DateTime.now().millisecondsSinceEpoch.toString(),
+                                  id: id
+                              );
 
                               // check = await dbHelper.updateNote(
                               //   updatedTitle: titleController.text,

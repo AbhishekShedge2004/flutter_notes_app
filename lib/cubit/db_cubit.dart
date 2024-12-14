@@ -12,7 +12,7 @@ class DBCubit extends Cubit<DBState>{
   void addData({required String mTitle, required String mDesc, required String mCreatedAt}) async {
     emit(DBLoadingState());
 
-    Future.delayed(Duration(seconds: 4), () async {
+    Future.delayed(Duration(seconds: 2), () async {
       bool check = await dbHelper.addNote(
           title: mTitle,
           desc: mDesc,
@@ -30,7 +30,46 @@ class DBCubit extends Cubit<DBState>{
   void getInitialNotes() async {
     emit(DBLoadingState());
 
-    var allNotes = await dbHelper.getAllNotesFromDB();
-    emit(DBLoadedState(mData: allNotes));
+    Future.delayed(Duration(seconds: 2), () async{
+      var allNotes = await dbHelper.getAllNotesFromDB();
+      emit(DBLoadedState(mData: allNotes));
+    },);
   }
+
+  void updateData({required String mUpdatedTitle, required String mUpdatedDesc, required String mUpdatedAt, required int id}) async{
+    emit(DBLoadingState());
+
+    Future.delayed(Duration(seconds: 2), () async{
+      bool check = await dbHelper.updateNote(
+          updatedTitle: mUpdatedTitle,
+          updatedDesc: mUpdatedDesc,
+          updatedAt: mUpdatedAt,
+          id: id
+      );
+      if(check){
+        var allNotes = await dbHelper.getAllNotesFromDB();
+        emit(DBLoadedState(mData: allNotes));
+      }else{
+        emit(DBErrorState(errorMsg: "Note not added"));
+      }
+    },);
+  }
+
+  void deleteData({required int id}) async{
+    emit(DBLoadingState());
+
+    Future.delayed(Duration(seconds: 2), () async{
+      bool check = await dbHelper.deleteNote(
+          id: id
+      );
+      if(check){
+        var allData = await dbHelper.getAllNotesFromDB();
+        emit(DBLoadedState(mData: allData));
+      }else{
+        emit(DBErrorState(errorMsg: "Note not added"));
+      }
+    },);
+  }
+
+
 }

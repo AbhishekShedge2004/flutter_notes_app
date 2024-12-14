@@ -92,16 +92,14 @@ class HomePage extends StatelessWidget {
                           //delete
                           IconButton(
                               onPressed: () async{
-                                Provider.of<DBProvider>(context,listen: false).deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
+                                context.read<DBCubit>().deleteData(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
                                 // bool check = await dbHelper.deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
                                 // if(check){
                                 //   getMyNotes();
                                 // }
                               },
                               icon: Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              )),
+                                Icons.delete, color: Colors.red,)),
                         ],
                       ),
                     ),
