@@ -1,7 +1,9 @@
+import 'package:database_new/bloc/db_bloc.dart';
 import 'package:database_new/db_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'bloc/db_bloc_events.dart';
 import 'cubit/db_cubit.dart';
 import 'db_helper.dart';
 
@@ -84,15 +86,15 @@ class AddNotePage extends StatelessWidget{
 
                           if (titleController.text.isNotEmpty && descController.text.isNotEmpty) {
 
-                            bool check = false;
+                            //bool check = false;
 
                             if(isUpdate){
-                              context.read<DBCubit>().updateData(
-                                  mUpdatedTitle: titleController.text,
-                                  mUpdatedDesc: descController.text,
-                                  mUpdatedAt: DateTime.now().millisecondsSinceEpoch.toString(),
+                              context.read<dbBloc>().add(updateData(
+                                  updatedTitle: titleController.text,
+                                  updatedDesc: descController.text,
+                                  updatedAt: DateTime.now().millisecondsSinceEpoch.toString(),
                                   id: id
-                              );
+                              ));
 
                               // check = await dbHelper.updateNote(
                               //   updatedTitle: titleController.text,
@@ -101,11 +103,11 @@ class AddNotePage extends StatelessWidget{
                               //   id: id,
                               // );
                             }else {
-                              context.read<DBCubit>().addData(
-                                  mTitle: titleController.text,
-                                  mDesc: descController.text,
-                                  mCreatedAt: DateTime.now().millisecondsSinceEpoch.toString()
-                              );
+                              context.read<dbBloc>().add(addData(
+                                  newTitle: titleController.text,
+                                  newDesc: descController.text,
+                                  createdAt: DateTime.now().millisecondsSinceEpoch.toString()
+                              ));
 
                               // check = await dbHelper.addNote(
                               //     title: titleController.text,

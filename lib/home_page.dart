@@ -1,4 +1,6 @@
 import 'package:database_new/add_note_page.dart';
+import 'package:database_new/bloc/db_bloc.dart';
+import 'package:database_new/bloc/db_bloc_events.dart';
 import 'package:database_new/db_helper.dart';
 import 'package:database_new/db_provider.dart';
 import 'package:database_new/main.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'bloc/db_bloc_state.dart';
 import 'cubit/db_cubit.dart';
 import 'cubit/db_state.dart';
 
@@ -29,27 +32,27 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     // context.read<DBProvider>().getInitialNotes();
-    context.read<DBCubit>().getInitialNotes();
+    context.read<dbBloc>().add(getInitialData());
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
 
       ),
-      body: BlocBuilder<DBCubit,DBState>(
+      body: BlocBuilder<dbBloc,dbBlocState>(
         builder: (context,state) {
 
-          if(state is DBLoadingState){
+          if(state is LoadingState){
             return Center(
               child: CircularProgressIndicator(),
             );
           }
-          if(state is DBErrorState){
+          if(state is ErrorState){
             return Center(
-              child: Text("Error: ${state.errorMsg}"),
+              child: Text("Error: ${state.error}"),
             );
           }
-          if(state is DBLoadedState){
+          if(state is LoadedState){
             allNotes = state.mData; //value.getAllNotesFromProvider()
 
             return allNotes.isNotEmpty
@@ -92,7 +95,8 @@ class HomePage extends StatelessWidget {
                           //delete
                           IconButton(
                               onPressed: () async{
-                                context.read<DBCubit>().deleteData(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
+                                context.read<dbBloc>().add(deleteData(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]));
+                                //context.read<DBCubit>().deleteData(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
                                 // bool check = await dbHelper.deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
                                 // if(check){
                                 //   getMyNotes();
@@ -133,8 +137,8 @@ class HomePage extends StatelessWidget {
 
         },
       ),
-      floatingActionButton: BlocBuilder<DBCubit,DBState>(builder: (context, state) {
-        if(state is DBLoadedState){
+      floatingActionButton: BlocBuilder<dbBloc,dbBlocState>(builder: (context, state) {
+        if(state is LoadedState){
           if(state.mData.isNotEmpty) {
             return FloatingActionButton(
               onPressed: () async {

@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import 'bloc/db_bloc.dart';
 import 'home_page.dart';
 
 void main() {
   runApp(BlocProvider(create: (context) {
-    return DBCubit(dbHelper: DBHelper.getInstance());
+    return dbBloc(dbHelper: DBHelper.getInstance());
   },child: MyApp(),));
 }
 
