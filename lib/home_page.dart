@@ -4,6 +4,7 @@ import 'package:database_new/bloc/db_bloc_events.dart';
 import 'package:database_new/db_helper.dart';
 import 'package:database_new/db_provider.dart';
 import 'package:database_new/main.dart';
+import 'package:database_new/note_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +19,7 @@ class HomePage extends StatelessWidget {
   // TextEditingController titleController = TextEditingController();
   // TextEditingController descController = TextEditingController();
 
-  List<Map<String, dynamic>> allNotes = [];
+  List<NoteModel> allNotes = [];
 
   DateFormat mFormat = DateFormat.yMd();
 
@@ -66,11 +67,11 @@ class HomePage extends StatelessWidget {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Flexible(child: Text(allNotes[index][DBHelper.COLUMN_NOTE_TITLE])),
-                        Text(mFormat.format(DateTime.fromMillisecondsSinceEpoch(int.parse(allNotes[index][DBHelper.COLUMN_NOTE_CREATED_AT]))),style: TextStyle(fontSize: 10),)
+                        Flexible(child: Text(allNotes[index].title)),
+                        Text(mFormat.format(DateTime.fromMillisecondsSinceEpoch(int.parse(allNotes[index].created_at))),style: TextStyle(fontSize: 10),)
                       ],
                     ),
-                    subtitle: Text(allNotes[index][DBHelper.COLUMN_NOTE_DESC]),
+                    subtitle: Text(allNotes[index].desc),
                     trailing: SizedBox(
                       width: 100,
                       child: Row(
@@ -78,15 +79,15 @@ class HomePage extends StatelessWidget {
                           //update
                           IconButton(
                               onPressed: () {
-                                var title = allNotes[index][DBHelper.COLUMN_NOTE_TITLE];
-                                var desc = allNotes[index][DBHelper.COLUMN_NOTE_DESC];
+                                var title = allNotes[index].title;
+                                var desc = allNotes[index].desc;
 
                                 // showModalBottomSheet(context: context, builder: (context) {
                                 //   return getBottomSheetUI(isUpdate: true, id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
                                 // },);
 
                                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                  return AddNotePage(isUpdate: true, id: allNotes[index][DBHelper.COLUMN_NOTE_ID], title: title, desc: desc,);
+                                  return AddNotePage(isUpdate: true, id: allNotes[index].id!, title: title, desc: desc,);
                                 },));
 
                               },
@@ -95,7 +96,7 @@ class HomePage extends StatelessWidget {
                           //delete
                           IconButton(
                               onPressed: () async{
-                                context.read<dbBloc>().add(deleteData(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]));
+                                context.read<dbBloc>().add(deleteData(id: allNotes[index].id!));
                                 //context.read<DBCubit>().deleteData(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
                                 // bool check = await dbHelper.deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
                                 // if(check){

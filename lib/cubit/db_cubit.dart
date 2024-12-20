@@ -1,5 +1,6 @@
 import "package:database_new/db_helper.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "../note_model.dart";
 import "db_state.dart";
 
 class DBCubit extends Cubit<DBState>{
@@ -14,9 +15,7 @@ class DBCubit extends Cubit<DBState>{
 
     Future.delayed(Duration(seconds: 2), () async {
       bool check = await dbHelper.addNote(
-          title: mTitle,
-          desc: mDesc,
-          createdAt: mCreatedAt
+          NoteModel(title: mTitle, desc: mDesc, created_at: mCreatedAt)
       );
       if (check) {
         var allNotes = await dbHelper.getAllNotesFromDB();

@@ -1,4 +1,5 @@
 import 'package:database_new/db_helper.dart';
+import 'package:database_new/note_model.dart';
 import 'package:flutter/material.dart';
 
 class DBProvider extends ChangeNotifier{
@@ -6,14 +7,12 @@ class DBProvider extends ChangeNotifier{
   DBProvider({required this.dbHelper});
 
   //data
-  List<Map<String,dynamic>> _mData = [];
+  List<NoteModel> _mData = [];
 
   //insert
   void addNote({required String mTitle, required String mDesc, required String mCreatedAt}) async{
     bool check = await dbHelper.addNote(
-        title: mTitle,
-        desc: mDesc,
-        createdAt: mCreatedAt
+       NoteModel(title: mTitle, desc: mDesc, created_at: mCreatedAt)
     );
     if(check){
       _mData = await dbHelper.getAllNotesFromDB();
@@ -21,7 +20,7 @@ class DBProvider extends ChangeNotifier{
     }
   }
 
-  List<Map<String,dynamic>> getAllNotesFromProvider(){
+  List<NoteModel> getAllNotesFromProvider(){
     return _mData;
   }
 

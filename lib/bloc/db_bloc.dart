@@ -1,6 +1,7 @@
 import 'package:database_new/bloc/db_bloc_events.dart';
 import 'package:database_new/bloc/db_bloc_state.dart';
 import 'package:database_new/db_helper.dart';
+import 'package:database_new/note_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class dbBloc extends Bloc<dbBlocEvents,dbBlocState>{
@@ -11,9 +12,7 @@ class dbBloc extends Bloc<dbBlocEvents,dbBlocState>{
     ///add note
     on<addData>((event, emit) async {
       bool check = await dbHelper.addNote(
-          title: event.newTitle,
-          desc: event.newDesc,
-          createdAt: event.createdAt
+          NoteModel(title: event.newTitle, desc: event.newDesc, created_at: event.createdAt)
       );
       if (check) {
         var currentData = await dbHelper.getAllNotesFromDB();
