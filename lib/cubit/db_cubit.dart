@@ -1,6 +1,6 @@
-import "package:database_new/db_helper.dart";
+import "package:database_new/db/db_helper.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-import "../note_model.dart";
+import "../model/note_model.dart";
 import "db_state.dart";
 
 class DBCubit extends Cubit<DBState>{

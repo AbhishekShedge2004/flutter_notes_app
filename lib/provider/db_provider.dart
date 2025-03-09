@@ -1,5 +1,5 @@
-import 'package:database_new/db_helper.dart';
-import 'package:database_new/note_model.dart';
+import 'package:database_new/db/db_helper.dart';
+import 'package:database_new/model/note_model.dart';
 import 'package:flutter/material.dart';
 
 class DBProvider extends ChangeNotifier{

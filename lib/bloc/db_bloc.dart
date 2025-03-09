@@ -1,7 +1,7 @@
 import 'package:database_new/bloc/db_bloc_events.dart';
 import 'package:database_new/bloc/db_bloc_state.dart';
-import 'package:database_new/db_helper.dart';
-import 'package:database_new/note_model.dart';
+import 'package:database_new/db/db_helper.dart';
+import 'package:database_new/model/note_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class dbBloc extends Bloc<dbBlocEvents,dbBlocState>{
@@ -12,7 +12,7 @@ class dbBloc extends Bloc<dbBlocEvents,dbBlocState>{
     ///add note
     on<addData>((event, emit) async {
       bool check = await dbHelper.addNote(
-          NoteModel(title: event.newTitle, desc: event.newDesc, created_at: event.createdAt)
+          NoteModel( title: event.newTitle, desc: event.newDesc, created_at: event.createdAt)
       );
       if (check) {
         var currentData = await dbHelper.getAllNotesFromDB();
@@ -28,13 +28,13 @@ class dbBloc extends Bloc<dbBlocEvents,dbBlocState>{
       if(currentData.isNotEmpty){
         emit(LoadedState(mData: currentData));
       }else{
-        emit(ErrorState(error: "Initial Notes getting error"));
+        emit(LoadedState(mData: []));
       }
     },);
 
     ///delete data
     on<deleteData>((event, emit) async{
-      bool check = await dbHelper.deleteNote(id: event.id);
+      bool check = await dbHelper.deleteNote(id : event.id);
       if(check){
         var currentData = await dbHelper.getAllNotesFromDB();
         emit(LoadedState(mData: currentData));

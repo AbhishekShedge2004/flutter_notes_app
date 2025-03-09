@@ -1,4 +1,4 @@
-import 'package:database_new/note_model.dart';
+import 'package:database_new/model/note_model.dart';
 
 abstract class dbBlocState{}
 

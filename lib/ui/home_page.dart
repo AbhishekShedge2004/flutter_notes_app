@@ -1,17 +1,19 @@
-import 'package:database_new/add_note_page.dart';
+import 'package:database_new/ui/add_note_page.dart';
 import 'package:database_new/bloc/db_bloc.dart';
 import 'package:database_new/bloc/db_bloc_events.dart';
-import 'package:database_new/db_helper.dart';
-import 'package:database_new/db_provider.dart';
+import 'package:database_new/db/db_helper.dart';
+import 'package:database_new/provider/db_provider.dart';
 import 'package:database_new/main.dart';
-import 'package:database_new/note_model.dart';
+import 'package:database_new/model/note_model.dart';
+import 'package:database_new/ui/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'bloc/db_bloc_state.dart';
-import 'cubit/db_cubit.dart';
-import 'cubit/db_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../bloc/db_bloc_state.dart';
+import '../cubit/db_cubit.dart';
+import '../cubit/db_state.dart';
 
 class HomePage extends StatelessWidget {
 
@@ -37,8 +39,22 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
-
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Home'),
+            ElevatedButton(onPressed: () async{
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              bool check = await prefs.setInt("UID", 0);
+              if(check){
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                  return LoginPage();
+                },));
+              }
+            }, child: Text("Logout"))
+          ],
+        ),
+        backgroundColor: Colors.purple,
       ),
       body: BlocBuilder<dbBloc,dbBlocState>(
         builder: (context,state) {
@@ -63,49 +79,58 @@ class HomePage extends StatelessWidget {
                 itemBuilder: (_, index) {
 
                   //Note View
-                  return ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(child: Text(allNotes[index].title)),
-                        Text(mFormat.format(DateTime.fromMillisecondsSinceEpoch(int.parse(allNotes[index].created_at))),style: TextStyle(fontSize: 10),)
-                      ],
+                  return Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(21),
                     ),
-                    subtitle: Text(allNotes[index].desc),
-                    trailing: SizedBox(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          //update
-                          IconButton(
-                              onPressed: () {
-                                var title = allNotes[index].title;
-                                var desc = allNotes[index].desc;
-
-                                // showModalBottomSheet(context: context, builder: (context) {
-                                //   return getBottomSheetUI(isUpdate: true, id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
-                                // },);
-
-                                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                  return AddNotePage(isUpdate: true, id: allNotes[index].id!, title: title, desc: desc,);
-                                },));
-
-                              },
-                              icon: Icon(Icons.edit)),
-
-                          //delete
-                          IconButton(
-                              onPressed: () async{
-                                context.read<dbBloc>().add(deleteData(id: allNotes[index].id!));
-                                //context.read<DBCubit>().deleteData(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
-                                // bool check = await dbHelper.deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
-                                // if(check){
-                                //   getMyNotes();
-                                // }
-                              },
-                              icon: Icon(
-                                Icons.delete, color: Colors.red,)),
-                        ],
+                    child: Card(
+                      elevation: 7,
+                      child: ListTile(
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(child: Text(allNotes[index].title)),
+                            Text(mFormat.format(DateTime.fromMillisecondsSinceEpoch(int.parse(allNotes[index].created_at))),style: TextStyle(fontSize: 10),)
+                          ],
+                        ),
+                        subtitle: Text(allNotes[index].desc),
+                        trailing: SizedBox(
+                          width: 100,
+                          child: Row(
+                            children: [
+                              //update
+                              IconButton(
+                                  onPressed: () {
+                                    var title = allNotes[index].title;
+                                    var desc = allNotes[index].desc;
+                      
+                                    // showModalBottomSheet(context: context, builder: (context) {
+                                    //   return getBottomSheetUI(isUpdate: true, id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
+                                    // },);
+                      
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                      return AddNotePage(isUpdate: true, id: allNotes[index].id!, title: title, desc: desc,);
+                                    },));
+                      
+                                  },
+                                  icon: Icon(Icons.edit)),
+                      
+                              //delete
+                              IconButton(
+                                  onPressed: () async{
+                                    context.read<dbBloc>().add(deleteData(id: allNotes[index].id!));
+                                    //context.read<DBCubit>().deleteData(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
+                                    // bool check = await dbHelper.deleteNote(id: allNotes[index][DBHelper.COLUMN_NOTE_ID]);
+                                    // if(check){
+                                    //   getMyNotes();
+                                    // }
+                                  },
+                                  icon: Icon(
+                                    Icons.delete, color: Colors.red,)),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   );
@@ -158,8 +183,6 @@ class HomePage extends StatelessWidget {
               },
               child: Icon(Icons.add),
             );
-          }else{
-            return Container();
           }
         }
         return Container();

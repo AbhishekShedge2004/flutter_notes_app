@@ -1,4 +1,4 @@
-import 'package:database_new/db_helper.dart';
+import 'package:database_new/db/db_helper.dart';
 
 abstract class dbBlocEvents{}
 

@@ -1,11 +1,11 @@
 import 'package:database_new/bloc/db_bloc.dart';
-import 'package:database_new/db_provider.dart';
+import 'package:database_new/provider/db_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'bloc/db_bloc_events.dart';
-import 'cubit/db_cubit.dart';
-import 'db_helper.dart';
+import '../bloc/db_bloc_events.dart';
+import '../cubit/db_cubit.dart';
+import '../db/db_helper.dart';
 
 class AddNotePage extends StatelessWidget{
   bool isUpdate;
